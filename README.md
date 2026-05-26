@@ -1,8 +1,10 @@
-# GitHub Agentic Efficiency Improver: Quickstart Guide
+# GitHub Agentic Efficiency Improver: Field Guide
 
 Set up automated energy efficiency improvements for your codebase in under 10 minutes using GitHub Agentic Workflows.
 
-It is recommended to review the documentation at **[GitHub Agentic Workflows Documentation](https://github.github.com/gh-aw/introduction/overview/)** which will help you underdstand agentic workflows using GitHub (after reading the Introduction and Setup, it will give you enough insight into setting up the Agentic Efficiency Improver using GitHub actions.
+It is recommended to review the documentation at **[GitHub Agentic Workflows Documentation](https://github.github.com/gh-aw/introduction/overview/)** which will help you underdstand agentic workflows using GitHub (after reading the Introduction and Setup), it will give you enough insight into setting up the Agentic Efficiency Improver using GitHub actions.
+
+Once you have read the documentation, you can then use the Quickstarts in this repo to set up and create the Agentic Efficiency Improver step-by-step. If you are interested in telling others about it or want to present it yourself, you can use the PowerPoint template that is in this repo along with slide notes. The presentation is ~20 minutes in length, but can be adjusted as needed.
 
 ---
 
