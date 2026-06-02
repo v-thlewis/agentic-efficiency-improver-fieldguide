@@ -8,6 +8,16 @@ Once you have read the documentation, you can then use the Quickstarts in this r
 
 ---
 
+## Setup Demo Video
+
+Watch the complete setup process in action:
+
+[▶️ View Setup Demo Video](file:///Users/thomaslewis/agentic-efficiency-improver-fieldguide/agentic-efficiency-improver-setup-demo.mp4) or #file:agentic-efficiency-improver-setup-demo.mp4
+
+This video walks you through the entire setup process from start to finish.
+
+---
+
 ## Prerequisites
 
 Before you start, verify you have:
