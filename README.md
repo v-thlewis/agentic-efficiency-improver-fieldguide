@@ -12,7 +12,7 @@ Once you have read the documentation, you can then use the Quickstarts in this r
 
 Watch the complete setup process in action:
 
-https://github.com/v-thlewis/agentic-efficiency-improver-fieldguide/assets/raw/main/agentic-efficiency-improver-setup-demo.mp4
+<video src="agentic-efficiency-improver-setup-demo.mp4" controls title="Agentic Efficiency Improver Setup Demo"></video>
 
 This video walks you through the entire setup process from start to finish.
 
