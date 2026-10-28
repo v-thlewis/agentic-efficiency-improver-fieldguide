@@ -2,7 +2,9 @@
 
 Set up automated energy efficiency improvements for your codebase in under 10 minutes using GitHub Agentic Workflows.
 
-It is recommended to review the documentation at **[GitHub Agentic Workflows Documentation](https://github.github.com/gh-aw/introduction/overview/)** which will help you underdstand agentic workflows using GitHub (after reading the Introduction and Setup), it will give you enough insight into setting up the Agentic Efficiency Improver using GitHub actions.
+> **GitHub Agentic Workflows is now generally available** ([announcement](https://github.blog/changelog/2026-10-28-github-agentic-workflows-generally-available/)). This guide has been verified against the GA release (`gh-aw` v1.0.1).
+
+It is recommended to review the documentation at **[GitHub Agentic Workflows Documentation](https://github.github.com/gh-aw/introduction/overview/)** which will help you understand agentic workflows using GitHub (after reading the Introduction and Setup), it will give you enough insight into setting up the Agentic Efficiency Improver using GitHub actions.
 
 Once you have read the documentation, you can then use the Quickstarts in this repo to set up and create the Agentic Efficiency Improver step-by-step. If you are interested in telling others about it or want to present it yourself, you can use the PowerPoint template that is in this repo along with slide notes. The presentation is ~20 minutes in length, but can be adjusted as needed.
 
@@ -14,7 +16,7 @@ Watch the complete setup process in action (click to play):
 
 [![Agentic Efficiency Improver Setup Demo](demo-thumbnail.png)](https://github.com/v-thlewis/agentic-efficiency-improver-fieldguide/raw/main/agentic-efficiency-improver-setup-demo.mp4)
 
-This video walks you through the entire setup process from start to finish.
+This video walks you through the entire setup process from start to finish. It was recorded during the public preview, so some wizard prompts and engine options may look slightly different in the GA release — follow the written steps below where they differ.
 
 ---
 
@@ -26,11 +28,12 @@ Before you start, verify you have:
 - **GitHub account** with write access to a repository
 - **GitHub Actions enabled** in your repository
 - **AI provider account** — Choose one:
-  - GitHub Copilot (recommended)
-  - Claude (Anthropic)
-  - OpenAI
-  - Google Gemini
-- **API key or personal access token** ready for your chosen AI provider
+  - GitHub Copilot (recommended, default engine — requires a Copilot license)
+  - Claude Code (Anthropic)
+  - OpenAI Codex
+  - Pi (uses your Copilot, Anthropic, or OpenAI account)
+  - Google Gemini (deprecated)
+- **API key or personal access token** ready for your chosen AI provider (not needed for Copilot if your organization has centralized Copilot billing)
 - **Test repository** with some commit history (for meaningful optimization results)
 
 ---
@@ -60,20 +63,25 @@ The wizard will guide you through configuration. No manual file editing needed.
 ### 3. Select Your AI Provider & Add Credentials
 
 When prompted, choose your AI provider:
-- **GitHub Copilot** (integrates natively with GitHub)
-- **Claude** (Anthropic)
-- **OpenAI**
-- **Google Gemini**
+- **GitHub Copilot** (default; integrates natively with GitHub)
+- **Claude Code** (Anthropic)
+- **OpenAI Codex**
+- **Pi**
+- **Google Gemini** (deprecated)
 
-Then provide your API credentials. The wizard automatically stores them as repository secrets—they're never exposed in logs or workflow files.
+Then provide your API credentials. The wizard automatically stores them as repository secrets—they're never exposed in logs or workflow files:
+- **Copilot:** choose **Use copilot-requests** (organization billing, no secret needed) or provide a fine-grained PAT with **Copilot Requests: Read** as `COPILOT_GITHUB_TOKEN`
+- **Claude:** `ANTHROPIC_API_KEY` · **Codex:** `OPENAI_API_KEY` · **Gemini:** `GEMINI_API_KEY`
+
+See [Authentication](https://github.github.com/gh-aw/reference/auth/) for details.
 
 ### 4. Review & Merge the Pull Request
 
-The wizard creates a pull request with:
+Choose to have the wizard create a pull request (it can also push directly). The PR contains:
 - `.github/workflows/efficiency-improver.lock.yml` — The compiled GitHub Actions workflow
-- `efficiency-improver.md` — The markdown source file
+- `.github/workflows/efficiency-improver.md` — The markdown source file
 
-Review the PR, then **merge it**. The workflow will automatically start running.
+Review the PR, then **merge it**. The workflow runs daily on a schedule; to start a run right away, let the wizard trigger one or run `gh aw run efficiency-improver`.
 
 ### 5. Monitor & Review Results
 
@@ -219,23 +227,25 @@ to catch.
 
 ## Workflow Configuration (Optional)
 
-The generated `efficiency-improver.md` file contains:
+The generated `.github/workflows/efficiency-improver.md` file contains (excerpt):
 
 **Frontmatter (YAML):**
 ```yaml
-on: 
-  schedule:
-    - cron: '0 9 * * *'          # Runs daily at 9 AM (edit to customize)
-  workflow_dispatch: {}            # Trigger manually when needed
-agents: [github-copilot]          # Change if using different AI provider
-read_permissions:
-  - contents: read
-  - issues: read
-  - pull_requests: read
-safe_outputs:
-  - pull_requests: write
-  - issues: write
-  - contents: write
+on:
+  schedule: daily                  # Runs once a day at a scattered time (edit to customize)
+  workflow_dispatch:               # Trigger manually when needed
+# engine: claude                   # Omitted = GitHub Copilot; set by the wizard for other engines
+timeout-minutes: 60
+permissions: read-all              # The agent itself is read-only
+safe-outputs:                      # The only write actions the workflow may perform
+  create-pull-request:
+    max: 3
+    draft: true
+    title-prefix: "[efficiency-improver] "
+  create-issue:
+    max: 4
+  add-comment:
+    max: 10
 ```
 
 **To customize:**
@@ -244,9 +254,9 @@ safe_outputs:
 3. Commit and push your changes
 
 Common customizations:
-- **Change schedule:** Edit the cron expression (use [crontab.guru](https://crontab.guru/) for help)
-- **Switch AI provider:** Change the `agents` field and update your API credentials in repository secrets
-- **Modify permissions:** Edit `read_permissions` or `safe_outputs` (use minimal necessary permissions)
+- **Change schedule:** Edit `schedule:` — e.g. `daily on weekdays`, `weekly`, or a cron expression such as `"0 9 * * *"` (see [Schedule Syntax](https://github.github.com/gh-aw/reference/schedule-syntax/) and [crontab.guru](https://crontab.guru/))
+- **Switch AI provider:** Set the `engine` field (e.g. `copilot`, `claude`, `codex`) and add the matching secret (`gh aw secrets --help`)
+- **Modify permissions:** Keep `permissions` read-only; adjust what the workflow may write via `safe-outputs` (use minimal necessary limits)
 
 ---
 
@@ -255,11 +265,11 @@ Common customizations:
 | Issue | Solution |
 |-------|----------|
 | `gh aw` command not found | Update GitHub CLI: `gh extension upgrade gh-aw` or reinstall with `gh extension install github/gh-aw` |
-| Wizard doesn't start | Run `gh auth status` to verify authentication; re-authenticate if needed with `gh auth login` |
-| Workflow fails in Actions tab | Check repository secrets: Go to **Settings > Secrets and variables > Actions**. Verify API key is named correctly (e.g., `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`). Click the failed workflow and then click the section that failed and it most likely will tell you what the issue is below; also you can also ask GitHub Copilot what this issue is by clicking the 'Explain error' button. |
+| Wizard doesn't start | Run `gh auth status` to verify authentication; re-authenticate if needed with `gh auth login --scopes repo,workflow`. Run `gh aw doctor` to diagnose setup issues |
+| Workflow fails in Actions tab | Check repository secrets: Go to **Settings > Secrets and variables > Actions**. Verify API key is named correctly (e.g., `COPILOT_GITHUB_TOKEN`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`). Click the failed workflow and then click the section that failed and it most likely will tell you what the issue is below; also you can also ask GitHub Copilot what this issue is by clicking the 'Explain error' button. |
 | Workflow takes too long | Efficiency Improver can take up to 60 minutes.|
 | No PRs generated after run | Check workflow logs in Actions tab. May need multiple runs to find optimization opportunities. Repos with complex patterns yield better results |
-| Want to re-run the workflow | Delete generated PRs/issues and manually trigger: `gh workflow run efficiency-improver.yml` |
+| Want to re-run the workflow | Delete generated PRs/issues and manually trigger: `gh aw run efficiency-improver` |
 | Permission denied when pushing | Verify your GitHub token has `repo` and `workflow` scopes: `gh auth status` |
 
 ---
